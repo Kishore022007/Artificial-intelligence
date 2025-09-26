@@ -1,0 +1,53 @@
+N = 8  # Number of queens
+
+def print_solution(board):
+    """Print the chessboard with queens."""
+    for row in board:
+        line = ""
+        for col in row:
+            line += "Q " if col else ". "
+        print(line)
+    print()
+
+
+def is_safe(board, row, col):
+    """Check if it's safe to place a queen at board[row][col]."""
+    
+    # Check column
+    for i in range(row):
+        if board[i][col]:
+            return False
+
+    # Check upper left diagonal
+    for i, j in zip(range(row - 1, -1, -1), range(col - 1, -1, -1)):
+        if board[i][j]:
+            return False
+
+    # Check upper right diagonal
+    for i, j in zip(range(row - 1, -1, -1), range(col + 1, N)):
+        if board[i][j]:
+            return False
+
+    return True
+
+
+def solve(board, row=0):
+    """Use backtracking to solve the 8 Queens problem."""
+    if row == N:  # All queens placed
+        print_solution(board)
+        return True
+
+    res = False
+    for col in range(N):
+        if is_safe(board, row, col):
+            board[row][col] = True
+            res = solve(board, row + 1) or res
+            board[row][col] = False  # Backtrack
+
+    return res
+
+
+if __name__ == "__main__":
+    board = [[False for _ in range(N)] for _ in range(N)]
+    if not solve(board):
+        print("No solution exists.")
