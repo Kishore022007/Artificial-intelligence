@@ -1,0 +1,58 @@
+from collections import deque
+
+def water_jug_bfs(m, n, d):
+    """
+    Solve the Water Jug Problem using BFS.
+    m = capacity of jug1
+    n = capacity of jug2
+    d = target amount of water
+    """
+    
+    visited = set()
+    queue = deque()
+    
+    # Start state: both jugs empty
+    queue.append(((0, 0), []))  
+    
+    while queue:
+        (jug1, jug2), path = queue.popleft()
+
+        # If goal is reached
+        if jug1 == d or jug2 == d:
+            path.append((jug1, jug2))
+            return path
+
+        # Skip visited states
+        if (jug1, jug2) in visited:
+            continue
+        visited.add((jug1, jug2))
+
+        # Generate possible moves
+        possible_states = [
+            (m, jug2),           # Fill jug1
+            (jug1, n),           # Fill jug2
+            (0, jug2),           # Empty jug1
+            (jug1, 0),           # Empty jug2
+            # Pour jug1 → jug2
+            (jug1 - min(jug1, n - jug2), jug2 + min(jug1, n - jug2)),
+            # Pour jug2 → jug1
+            (jug1 + min(jug2, m - jug1), jug2 - min(jug2, m - jug1)),
+        ]
+
+        for state in possible_states:
+            queue.append((state, path + [(jug1, jug2)]))
+
+    return None
+
+
+# Example usage
+if __name__ == "__main__":
+    m, n, d = 4, 3, 2  # Jug1=4L, Jug2=3L, target=2L
+    solution = water_jug_bfs(m, n, d)
+
+    if solution:
+        print("Steps to reach the solution:")
+        for step in solution:
+            print(step)
+    else:
+        print("No solution exists.")
