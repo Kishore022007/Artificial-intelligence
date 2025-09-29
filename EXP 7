@@ -1,0 +1,41 @@
+from collections import deque
+
+def bfs(graph, start):
+    """
+    Breadth-First Search (BFS) implementation.
+    graph: dictionary representing adjacency list
+    start: starting node
+    """
+    visited = set()
+    queue = deque([start])
+    order = []
+
+    while queue:
+        node = queue.popleft()
+        if node not in visited:
+            visited.add(node)
+            order.append(node)
+            # Add unvisited neighbors
+            for neighbor in graph.get(node, []):
+                if neighbor not in visited:
+                    queue.append(neighbor)
+    
+    return order
+
+
+# Example usage
+if __name__ == "__main__":
+    # Graph as adjacency list
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['D', 'E'],
+        'C': ['F'],
+        'D': [],
+        'E': ['F'],
+        'F': []
+    }
+
+    start_node = 'A'
+    bfs_order = bfs(graph, start_node)
+
+    print("BFS Traversal starting from", start_node, ":", bfs_order)
