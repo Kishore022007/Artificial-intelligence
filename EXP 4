@@ -1,0 +1,49 @@
+import itertools
+
+def solve_cryptarithmetic(words, result):
+    """
+    Solve a cryptarithmetic puzzle like SEND + MORE = MONEY.
+    words  = list of addends (e.g. ["SEND", "MORE"])
+    result = result word (e.g. "MONEY")
+    """
+
+    # Extract unique characters
+    unique_chars = set("".join(words) + result)
+    if len(unique_chars) > 10:
+        raise ValueError("Too many unique letters (more than 10).")
+
+    letters = list(unique_chars)
+    first_letters = {w[0] for w in words + [result]}  # Can't assign 0 to these
+
+    for perm in itertools.permutations(range(10), len(letters)):
+        mapping = dict(zip(letters, perm))
+
+        # Skip if a word starts with zero
+        if any(mapping[ch] == 0 for ch in first_letters):
+            continue
+
+        # Convert words to numbers
+        word_values = [int("".join(str(mapping[ch]) for ch in w)) for w in words]
+        result_value = int("".join(str(mapping[ch]) for ch in result))
+
+        # Check if equation holds
+        if sum(word_values) == result_value:
+            return mapping, word_values, result_value
+
+    return None
+
+
+# Example usage
+if __name__ == "__main__":
+    words = ["SEND", "MORE"]
+    result = "MONEY"
+
+    solution = solve_cryptarithmetic(words, result)
+
+    if solution:
+        mapping, addends, res = solution
+        print("Solution found!")
+        print("Mapping:", mapping)
+        print("Equation:", " + ".join(map(str, addends)), "=", res)
+    else:
+        print("No solution found.")
