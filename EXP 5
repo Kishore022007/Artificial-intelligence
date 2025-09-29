@@ -1,0 +1,70 @@
+from collections import deque
+
+def is_valid(state):
+    """Check if the state is valid (no missionaries eaten)."""
+    m_left, c_left, m_right, c_right, _ = state
+    
+    # Missionaries eaten condition
+    if (m_left < c_left and m_left > 0) or (m_right < c_right and m_right > 0):
+        return False
+    
+    # No negative values allowed
+    if m_left < 0 or c_left < 0 or m_right < 0 or c_right < 0:
+        return False
+    
+    return True
+
+
+def get_neighbors(state):
+    """Generate all possible next states."""
+    m_left, c_left, m_right, c_right, boat = state
+    moves = [(1,0), (2,0), (0,1), (0,2), (1,1)]  # possible boat moves
+    
+    neighbors = []
+    for m, c in moves:
+        if boat == 'left':  # boat moving left → right
+            new_state = (m_left - m, c_left - c, m_right + m, c_right + c, 'right')
+        else:  # boat moving right → left
+            new_state = (m_left + m, c_left + c, m_right - m, c_right - c, 'left')
+        
+        if is_valid(new_state):
+            neighbors.append(new_state)
+    
+    return neighbors
+
+
+def bfs(start, goal):
+    """Breadth-First Search to solve missionaries and cannibals."""
+    queue = deque()
+    queue.append((start, [start]))
+    visited = set()
+    
+    while queue:
+        state, path = queue.popleft()
+        if state in visited:
+            continue
+        visited.add(state)
+        
+        if state == goal:
+            return path
+        
+        for neighbor in get_neighbors(state):
+            if neighbor not in visited:
+                queue.append((neighbor, path + [neighbor]))
+    
+    return None
+
+
+if __name__ == "__main__":
+    # Initial state: 3 missionaries, 3 cannibals on left, boat on left
+    start_state = (3, 3, 0, 0, 'left')
+    goal_state  = (0, 0, 3, 3, 'right')
+
+    solution = bfs(start_state, goal_state)
+
+    if solution:
+        print("Solution found in", len(solution) - 1, "moves:")
+        for step in solution:
+            print(step)
+    else:
+        print("No solution found.")
