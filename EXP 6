@@ -1,0 +1,43 @@
+def vacuum_cleaner(start_state):
+    """
+    Simple vacuum cleaner problem.
+    start_state = (vacuum_location, roomA_status, roomB_status)
+    location: 'A' or 'B'
+    status: 'Clean' or 'Dirty'
+    """
+    
+    state = list(start_state)
+    steps = []
+
+    while state[1] == "Dirty" or state[2] == "Dirty":
+        location, roomA, roomB = state
+
+        if location == "A":
+            if roomA == "Dirty":
+                steps.append("Suck dirt in A")
+                state[1] = "Clean"
+            else:
+                steps.append("Move Right to B")
+                state[0] = "B"
+
+        elif location == "B":
+            if roomB == "Dirty":
+                steps.append("Suck dirt in B")
+                state[2] = "Clean"
+            else:
+                steps.append("Move Left to A")
+                state[0] = "A"
+
+    return steps, tuple(state)
+
+
+# Example Usage
+if __name__ == "__main__":
+    start = ("A", "Dirty", "Dirty")  # Vacuum at A, both rooms dirty
+    steps, final_state = vacuum_cleaner(start)
+
+    print("Initial State:", start)
+    print("Steps Taken:")
+    for s in steps:
+        print(" -", s)
+    print("Final State:", final_state)
