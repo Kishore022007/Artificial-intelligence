@@ -1,0 +1,53 @@
+# Map Coloring using Constraint Satisfaction Problem (CSP)
+# ---------------------------------------------
+
+# Define the map (neighbors for each region)
+neighbors = {
+    'WA': ['NT', 'SA'],
+    'NT': ['WA', 'SA', 'Q'],
+    'SA': ['WA', 'NT', 'Q', 'NSW', 'V'],
+    'Q':  ['NT', 'SA', 'NSW'],
+    'NSW': ['Q', 'SA', 'V'],
+    'V':  ['SA', 'NSW'],
+    'T':  []  # Tasmania has no borders on the mainland
+}
+
+# Define available colors
+colors = ['Red', 'Green', 'Blue']
+
+# Function to check if the color assignment is valid
+def is_valid(region, color, assignment):
+    for neighbor in neighbors[region]:
+        if neighbor in assignment and assignment[neighbor] == color:
+            return False
+    return True
+
+# Backtracking CSP solver
+def map_coloring(assignment):
+    # If all regions are assigned, return the solution
+    if len(assignment) == len(neighbors):
+        return assignment
+    
+    # Select an unassigned region
+    unassigned = [r for r in neighbors if r not in assignment][0]
+    
+    # Try each color for this region
+    for color in colors:
+        if is_valid(unassigned, color, assignment):
+            assignment[unassigned] = color
+            result = map_coloring(assignment)
+            if result is not None:
+                return result
+            # Backtrack
+            del assignment[unassigned]
+    
+    return None
+
+
+# Run the CSP solver
+solution = map_coloring({})
+
+# Display the result
+print("Map Coloring Solution:")
+for region, color in solution.items():
+    print(f"{region}: {color}")
