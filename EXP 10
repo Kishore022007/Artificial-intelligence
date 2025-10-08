@@ -1,0 +1,67 @@
+from queue import PriorityQueue
+
+# A* Search Algorithm
+def a_star_search(graph, start, goal, heuristic):
+    # Priority queue to store nodes with their f(n) = g(n) + h(n)
+    open_list = PriorityQueue()
+    open_list.put((0, start))  # (priority, node)
+    
+    # Dictionaries for tracking cost and parent
+    g_cost = {start: 0}
+    came_from = {start: None}
+    
+    while not open_list.empty():
+        _, current = open_list.get()
+        
+        # Stop when the goal is reached
+        if current == goal:
+            break
+        
+        # Explore neighbors
+        for neighbor, cost in graph[current].items():
+            new_cost = g_cost[current] + cost
+            
+            # If a cheaper path to neighbor is found
+            if neighbor not in g_cost or new_cost < g_cost[neighbor]:
+                g_cost[neighbor] = new_cost
+                f_cost = new_cost + heuristic[neighbor]
+                open_list.put((f_cost, neighbor))
+                came_from[neighbor] = current
+    
+    # Reconstruct the shortest path
+    path = []
+    current = goal
+    while current is not None:
+        path.append(current)
+        current = came_from[current]
+    path.reverse()
+    
+    return path, g_cost[goal]
+
+
+# Example Graph (Adjacency list representation)
+graph = {
+    'A': {'B': 1, 'C': 3},
+    'B': {'A': 1, 'C': 1, 'D': 5},
+    'C': {'A': 3, 'B': 1, 'D': 2, 'E': 3},
+    'D': {'B': 5, 'C': 2, 'E': 1},
+    'E': {'C': 3, 'D': 1}
+}
+
+# Heuristic values (estimated cost from node to goal)
+heuristic = {
+    'A': 7,
+    'B': 6,
+    'C': 2,
+    'D': 1,
+    'E': 0
+}
+
+# Run A* Search
+start_node = 'A'
+goal_node = 'E'
+
+path, cost = a_star_search(graph, start_node, goal_node, heuristic)
+
+print("Shortest Path:", path)
+print("Total Cost:", cost)
