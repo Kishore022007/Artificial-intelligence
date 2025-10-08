@@ -1,0 +1,120 @@
+import math
+
+# Initialize the Tic Tac Toe board
+board = [' ' for _ in range(9)]
+
+# Function to print the board
+def print_board():
+    print()
+    print(f"{board[0]} | {board[1]} | {board[2]}")
+    print("--+---+--")
+    print(f"{board[3]} | {board[4]} | {board[5]}")
+    print("--+---+--")
+    print(f"{board[6]} | {board[7]} | {board[8]}")
+    print()
+
+# Function to check for a winner
+def check_winner(player):
+    win_patterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # columns
+        [0, 4, 8], [2, 4, 6]              # diagonals
+    ]
+    for pattern in win_patterns:
+        if all(board[i] == player for i in pattern):
+            return True
+    return False
+
+# Function to check for tie
+def check_tie():
+    return ' ' not in board
+
+# Alpha-Beta Pruning Algorithm
+def alphabeta(is_maximizing, alpha, beta):
+    if check_winner('O'):   # AI win
+        return 1
+    elif check_winner('X'): # Player win
+        return -1
+    elif check_tie():
+        return 0
+
+    if is_maximizing:
+        max_eval = -math.inf
+        for i in range(9):
+            if board[i] == ' ':
+                board[i] = 'O'
+                eval = alphabeta(False, alpha, beta)
+                board[i] = ' '
+                max_eval = max(max_eval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:  # Beta cut-off
+                    break
+        return max_eval
+    else:
+        min_eval = math.inf
+        for i in range(9):
+            if board[i] == ' ':
+                board[i] = 'X'
+                eval = alphabeta(True, alpha, beta)
+                board[i] = ' '
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:  # Alpha cut-off
+                    break
+        return min_eval
+
+# Function for AI move using Alpha-Beta
+def ai_move():
+    best_score = -math.inf
+    best_move = None
+    for i in range(9):
+        if board[i] == ' ':
+            board[i] = 'O'
+            score = alphabeta(False, -math.inf, math.inf)
+            board[i] = ' '
+            if score > best_score:
+                best_score = score
+                best_move = i
+    board[best_move] = 'O'
+
+# Main game function
+def play_game():
+    print("🎮 Tic Tac Toe with AI using Alpha-Beta Pruning (You = X, AI = O)")
+    print_board()
+
+    while True:
+        # Player move
+        try:
+            move = int(input("Enter your move (1-9): ")) - 1
+            if move < 0 or move > 8 or board[move] != ' ':
+                print("Invalid move! Try again.")
+                continue
+        except ValueError:
+            print("Please enter a number between 1 and 9.")
+            continue
+
+        board[move] = 'X'
+        print_board()
+
+        if check_winner('X'):
+            print("🎉 You win!")
+            break
+        elif check_tie():
+            print("🤝 It's a tie!")
+            break
+
+        # AI move
+        print("💻 AI is thinking...")
+        ai_move()
+        print_board()
+
+        if check_winner('O'):
+            print("💻 AI wins!")
+            break
+        elif check_tie():
+            print("🤝 It's a tie!")
+            break
+
+# Run the game
+if __name__ == "__main__":
+    play_game()
